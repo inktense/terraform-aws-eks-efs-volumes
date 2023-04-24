@@ -1,19 +1,3 @@
-resource "aws_default_subnet" "default_az1" {
-  availability_zone = "${var.aws_region}a"
-
-  tags = {
-    Name = "Default subnet for eu-west-2a"
-  }
-}
-
-resource "aws_default_subnet" "default_az2" {
-  availability_zone = "${var.aws_region}b"
-
-  tags = {
-    Name = "Default subnet for eu-west-2b"
-  }
-}
-
 resource "aws_eks_cluster" "k8s-efs" {
   name     = "${var.project_prefix}-cluster"
   role_arn = aws_iam_role.eks_role.arn
@@ -21,4 +5,34 @@ resource "aws_eks_cluster" "k8s-efs" {
   vpc_config {
     subnet_ids = [aws_default_subnet.default_az1.id, aws_default_subnet.default_az2.id]
   }
+
+  tags = local.tags
+}
+
+resource "aws_eks_node_group" "node" {
+  cluster_name    = aws_eks_cluster.k8s-efs.name
+  node_group_name = "efs-node-group"
+  node_role_arn   = aws_iam_role.node_role.arn
+  subnet_ids      = aws_default_subnet.default_az1[*].id
+
+  instance_types = ["t3.medium"]
+
+  scaling_config {
+    desired_size = 1
+    max_size     = 1
+    min_size     = 1
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  tags = local.tags
+}
+
+# Security Group created by the EKS cluster
+# Will be used by the EFS mount targets
+output "cluster_security_group_id" {
+  value = aws_eks_cluster.k8s-efs.vpc_config[0].cluster_security_group_id
+  description = "value of the EKS cluster security group ID"
 }
