@@ -29,10 +29,3 @@ resource "aws_eks_node_group" "node" {
 
   tags = local.tags
 }
-
-# Security Group created by the EKS cluster
-# Will be used by the EFS mount targets
-output "cluster_security_group_id" {
-  value = aws_eks_cluster.k8s-efs.vpc_config[0].cluster_security_group_id
-  description = "value of the EKS cluster security group ID"
-}
