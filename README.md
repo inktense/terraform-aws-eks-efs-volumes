@@ -118,43 +118,13 @@ efs-app-1   1/1     Running   0          56s
 ```
 
 In the EFS File system should now be a new Access point.
-```bash 
+
+After finishing make sure to delete everything
+```bash
+tf destroy
 ```
 
 REFERENCE https://docs.aws.amazon.com/eks/latest/userguide/efs-csi.html
-
-
-
-kubectl kustomize \
-    "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release- v1.5.4" > public-ecr-driver.yaml
-
-
-eksctl create iamserviceaccount \
-    --approve \
-    --override-existing-serviceaccounts \
-    --cluster aws-k8s-efs-cluster \
-    --namespace kube-system \
-    --name efs-csi-controller-sa \
-    --attach-policy-arn arn:aws:iam::635567262396:policy/AmazonEKS_EFS_CSI_Driver_Policy \
-    --region eu-west-2 \
-    
-
-
-eksctl create iamserviceaccount \ 
-  --cluster aws-k8s-efs-cluster \ 
-  --region eu-west-2 \ 
-  --namespace kube-system \ 
-  --name efs-csi-controller-sa \ 
-  --override-existing-serviceaccounts \ 
-  --attach-policy-arn arn:aws:iam::635567262396:policy/EFSCSIControllerIAMPolicy \ 
-  --approve
-
-
-helm upgrade -i aws-efs-csi-driver aws-efs-csi-driver/aws-efs-csi-driver \
-    --namespace kube-system \
-    --set image.repository=602401143452.dkr.ecr.eu-west-2.amazonaws.com.com/eks/aws-efs-csi-driver \
-    --set controller.serviceAccount.create=false \
-    --set controller.serviceAccount.name=efs-csi-controller-sa
 
 
     

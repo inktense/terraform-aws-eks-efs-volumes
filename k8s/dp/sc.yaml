@@ -7,5 +7,5 @@ provisioner: efs.csi.aws.com
 
 parameters:
   provisioningMode: efs-ap
-  fileSystemId: fs-040423dcd881f48a8
+  fileSystemId: fs-086ae2941962da4c2
   directoryPerms: "700"
